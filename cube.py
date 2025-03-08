@@ -1,20 +1,36 @@
 import math 
 import numpy as np
 from pprint import pprint
+import random
 
 class cube:
     def __init__ (self):
       
         self.face = {
-            "Top": np.array([[0] * 3 for _ in range(3)]),
-            "Bottom": np.array([[5] * 3 for _ in range(3)]),
-            "Left": np.array([[1] * 3 for _ in range(3)]),
-            "Right": np.array([[3] * 3 for _ in range(3)]),
-            "Front": np.array([[2] * 3 for _ in range(3)]),
-            "Back": np.array([[4] * 3 for _ in range(3)])
+            "Top": [[0] * 3 for _ in range(3)],
+            "Bottom":[[5] * 3 for _ in range(3)],
+            "Left": [[1] * 3 for _ in range(3)],
+            "Right": [[3] * 3 for _ in range(3)],
+            "Front": [[2] * 3 for _ in range(3)],
+            "Back": [[4] * 3 for _ in range(3)]
         }    #this numbering is crucical as the loss depends on the orientation of these numbers so top is always 0 and bottom is always 5 and so on. JUST DONT CHANGE THIS CODE
         
-       
+
+        self.moves={
+                0: 'U',     # Rotate the top face clockwise
+                1: 'L',     # Rotate the left face clockwise
+                2: 'R',     # Rotate the right face clockwise
+                3: 'F',     # Rotate the front face clockwise
+                4: 'B',     # Rotate the back face clockwise
+                5: 'D',     # Rotate the bottom face clockwise
+                6: 'D\'',   # Rotate the top face counterclockwise
+                7: 'B\'',   # Rotate the left face counterclockwise
+                8: 'F\'',   # Rotate the right face counterclockwise
+                9: 'R\'',  # Rotate the front face counterclockwise
+                10: 'L\'',  # Rotate the back face counterclockwise
+                11: 'U\''   # Rotate the bottom face counterclockwise
+            } 
+       #arranged in such a way that complement gives the opposite move. 
     
     def display (self):
         for row in self.state:
@@ -27,7 +43,6 @@ class cube:
         faces_list = np.vstack(faces_list)       
         
         state = np.array(faces_list).T.reshape(3,18)  # Use transpose to get the 3x18 shape
-        print(state)
 
         loss=54
         for i in range(3):
@@ -38,16 +53,50 @@ class cube:
         return loss
     
 
+    # def rotate_face_clockwise(self, face_name):
+    #     face = self.face[face_name]
+    #     face[0][0], face[2][0], face[2][2], face[0][2] = face[2][0], face[2][2], face[0][2], face[0][0]
+    #     face[0][1], face[1][0], face[2][1], face[1][2] = face[1][0], face[2][1], face[1][2], face[0][1]
+
+    # def rotate_face_counter_clockwise(self, face_name):
+    #     face = self.face[face_name]
+    #     face[0][0], face[0][2], face[2][2], face[2][0] = face[0][2], face[2][2], face[2][0], face[0][0]
+    #     face[0][1], face[1][2], face[2][1], face[1][0] = face[1][2], face[2][1], face[1][0], face[0][1]
+        
+
     def rotate_face_clockwise(self, face_name):
         face = self.face[face_name]
-        face[0][0], face[2][0], face[2][2], face[0][2] = face[2][0], face[2][2], face[0][2], face[0][0]
-        face[0][1], face[1][0], face[2][1], face[1][2] = face[1][0], face[2][1], face[1][2], face[0][1]
-
+        
+        # Using a temporary variable to store elements during rotation
+        temp = face[0][0]
+        face[0][0] = face[2][0]
+        face[2][0] = face[2][2]
+        face[2][2] = face[0][2]
+        face[0][2] = temp
+        
+        temp = face[0][1]
+        face[0][1] = face[1][0]
+        face[1][0] = face[2][1]
+        face[2][1] = face[1][2]
+        face[1][2] = temp
+        
     def rotate_face_counter_clockwise(self, face_name):
         face = self.face[face_name]
-        face[0][0], face[0][2], face[2][2], face[2][0] = face[0][2], face[2][2], face[2][0], face[0][0]
-        face[0][1], face[1][2], face[2][1], face[1][0] = face[1][2], face[2][1], face[1][0], face[0][1]
         
+        # Using a temporary variable to store elements during rotation
+        temp = face[0][0]
+        face[0][0] = face[0][2]
+        face[0][2] = face[2][2]
+        face[2][2] = face[2][0]
+        face[2][0] = temp
+        
+        temp = face[0][1]
+        face[0][1] = face[1][2]
+        face[1][2] = face[2][1]
+        face[2][1] = face[1][0]
+        face[1][0] = temp
+
+
         
     # Rotate the top face clockwise
     def rotate_top_clockwise(self):
@@ -192,7 +241,6 @@ class cube:
             
 
             
-            pprint(self.face)
 
             if move == 'U':
                 cube.rotate_top_clockwise(self)
@@ -220,8 +268,14 @@ class cube:
                 cube.rotate_back_counter_clockwise(self)
             else:
                 print(f"Invalid move: {move}")
-                
-            pprint(self.face)
+    
+    def make_random_move(self):
+        random_move_idx = random.randint(0, 11)
+        self.rotate_cube(self.moves[random_move_idx])
+        return random_move_idx    #needed if we need to revert the move
+
+    def revert_move(self,move_idx):
+        self.rotate_cube(self.moves[11-move_idx])  #thats how the dict was made
 
         
 
