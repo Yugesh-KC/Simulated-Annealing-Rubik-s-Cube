@@ -32,10 +32,37 @@ class cube:
             } 
        #arranged in such a way that complement gives the opposite move. 
     
-    def display (self):
-        for row in self.state:
-            print(row)
-            
+  
+    
+    def display(self):
+        """Displays the cube faces using color emojis."""
+        color_map = {
+            0: "🟧",           
+            1: "🟩",  
+            2: "⬜",  
+            3: "🟦",  
+            4: "🟨" ,  
+            5: "🟥" 
+        }
+        
+        def print_face(face):
+            for row in face:
+                print(" ".join(color_map[val] for val in row))
+        
+        print("\n    Top:")
+        print_face(self.face["Top"])
+        
+        print("\nLeft:      Front:     Right:")
+        for l, f, r in zip(self.face["Left"], self.face["Front"], self.face["Right"]):
+            print(" ".join(color_map[val] for val in l), "  ", 
+                  " ".join(color_map[val] for val in f), "  ", 
+                  " ".join(color_map[val] for val in r))
+        
+        print("\n    Back:")
+        print_face(self.face["Back"])
+        
+        print("\n    Bottom:")
+        print_face(self.face["Bottom"])    
             
     def loss(self):
         faces_list=[]
